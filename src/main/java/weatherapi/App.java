@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 import org.json.JSONObject;
 
-class App extends Application {
+public class App extends Application {
     private static final String API_KEY = "6eb7933611b64558b7e72119231411";
     private static final String API_URL = "http://api.weatherapi.com/v1/current.json";
 
@@ -22,31 +22,39 @@ class App extends Application {
         launch(args);
     }
 
+    public App() {}
+
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Weather App");
 
         BorderPane borderPane = new BorderPane();
-        borderPane.setTop(new Label("Enter city name:"));
+        VBox weatherInfoBox = new VBox();
+        weatherInfoBox.setAlignment(Pos.CENTER);
+        weatherInfoBox.setSpacing(10);
 
         TextField cityInput = new TextField();
-        Button searchButton = new Button("Enter");
-        HBox searchBox = new HBox(10, cityInput, searchButton);
-        searchBox.setAlignment(Pos.CENTER);
-        borderPane.setCenter(searchBox);
+        cityInput.setPromptText("Enter city name");
+        Button getWeatherButton = new Button("Get Weather");
 
-        VBox weatherInfoBox = new VBox(10);
-        weatherInfoBox.setAlignment(Pos.CENTER);
-
-        searchButton.setOnAction(event -> {
+        getWeatherButton.setOnAction(event -> {
             String cityName = cityInput.getText();
             if (!cityName.isEmpty()) {
                 JSONObject weatherData = getWeatherData(cityName);
                 if (weatherData != null) {
-                    JSONObject currentObject = (JSONObject) weatherData.get("current");
-                    String description = (String) currentObject.get("condition").toString();
-                    double temperature = Double.parseDouble(currentObject.get("temp_c").toString());
-                    String weatherInfo = "Weather: " + description + "\nTemperature: " + temperature + "°C";
+                    JSONObject currentObject = weatherData.getJSONObject("current");
+                    JSONObject conditionObject = currentObject.getJSONObject("condition");
+                    String description = conditionObject.getString("text");
+                    double temperature = currentObject.getDouble("temp_c");
+                    double feelsLike = currentObject.getDouble("feelslike_c");
+                    int humidity = currentObject.getInt("humidity");
+                    double windSpeed = currentObject.getDouble("wind_kph");
+
+                    String weatherInfo = String.format(
+                        "Weather: %s\nTemperature: %.1f°C\nFeels Like: %.1f°C\nHumidity: %d%%\nWind Speed: %.1f kph",
+                        description, temperature, feelsLike, humidity, windSpeed
+                    );
+
                     weatherInfoBox.getChildren().clear();
                     weatherInfoBox.getChildren().add(new Label(weatherInfo));
                 } else {
@@ -56,9 +64,14 @@ class App extends Application {
             }
         });
 
-        borderPane.setBottom(weatherInfoBox);
+        VBox inputBox = new VBox(cityInput, getWeatherButton);
+        inputBox.setAlignment(Pos.CENTER);
+        inputBox.setSpacing(10);
 
-        Scene scene = new Scene(borderPane, 400, 200);
+        borderPane.setTop(inputBox);
+        borderPane.setCenter(weatherInfoBox);
+
+        Scene scene = new Scene(borderPane, 400, 300);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
