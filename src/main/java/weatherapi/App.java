@@ -11,12 +11,13 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.Scanner;
-
+import io.github.cdimascio.dotenv.Dotenv;
 import org.json.JSONObject;
 
 public class App extends Application {
-    private static final String API_KEY = "6eb7933611b64558b7e72119231411";
-    private static final String API_URL = "http://api.weatherapi.com/v1/current.json";
+    private static final Dotenv dotenv = Dotenv.load();
+    private static final String API_KEY = dotenv.get("API_KEY");
+    private static final String API_URL = dotenv.get("API_ENDPOINT");
 
     public static void main(String[] args) {
         launch(args);

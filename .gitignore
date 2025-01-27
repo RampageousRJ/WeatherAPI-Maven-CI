@@ -63,3 +63,6 @@ bin/
 # Windows
 Thumbs.db
 ehthumbs.db
+
+# Environment Variables
+*.env
