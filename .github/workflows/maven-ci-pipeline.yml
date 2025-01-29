@@ -1,0 +1,54 @@
+name: Maven CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: maven:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Build
+        run: mvn compile
+
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: maven:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Tests
+        run: mvn test
+
+  package:
+    runs-on: ubuntu-latest
+    container:
+      image: maven:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Package
+        run: mvn package
+
+  deploy:
+    runs-on: ubuntu-latest
+    container:
+      image: maven:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Deploy
+        run: mvn test
